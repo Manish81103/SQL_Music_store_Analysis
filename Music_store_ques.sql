@@ -16,7 +16,7 @@ limit 1 ;
 
 /* Q3: What are top 3 values of total invoice? */
 
-select invoice_id,sum(total)
+select invoice_id,sum(total) as total
 from invoice
 group by invoice_id
 order by sum(total) desc
@@ -26,14 +26,14 @@ limit 3;
 Write a query that returns one city that has the highest sum of invoice totals. 
 Return both the city name & sum of all invoice totals */
 
-select billing_city,sum(total)
+select billing_city,sum(total) as total
 from invoice
 group by billing_city
 order by sum(total) desc
 limit 1;
 
 /* Q5: Who is the best customer? The customer who has spent the most money will be declared the best customer. 
-Write a query that returns the person who has spent the most money.*/
+Write a query that returns the person who has spent the most money. */
 
 select cus.customer_id,cus.first_name,sum(inv.total) as spending
 from customer cus
@@ -65,7 +65,8 @@ order by cus.email;
 Write a query that returns the Artist name and total track count of the top 10 rock bands. */
 
 
-select ar.name,count(track_id),ge.name from track t
+select ar.name,count(track_id),ge.name as Genre
+from track t 
 join album al on al.album_id = t.album_id
 join genre ge on ge.genre_id = t.genre_id
 join artist ar on ar.artist_id = al.artist_id
@@ -74,9 +75,9 @@ group by ge.name,ar.name
 order by count(track_id) desc
 limit 10;
 
-/*Q8: Return all the track names that have a song length longer than the average song length. 
+/* Q8: Return all the track names that have a song length longer than the average song length. 
 Return the Name and Milliseconds for each track. Order by the song length with the 
-longest songs listed first*/
+longest songs listed first */
 
 select name,milliseconds
 from track
@@ -84,9 +85,34 @@ where milliseconds > (select avg(milliseconds)
 from track)
 order by milliseconds desc;
 
- 
-/*Q9: Find how much amount spent by each customer on artists? Write a query to return 
-customer name, artist name and total spent*/
+
+/* Q9: Make a stored procedure to display artist name and total amount of their album sales */  
+
+delimiter $$
+create procedure P_total()
+begin
+select art.name , round(sum(inv.total),1) as total
+from artist art
+join album alb
+on art.artist_id = alb.artist_id 
+join track tr
+on alb.album_id = tr.album_id 
+join invoice_line invl
+on tr.track_id = invl.track_id
+join invoice inv
+on invl.invoice_id = inv.invoice_id
+group by art.name
+order by sum(inv.total) desc;
+
+end $$
+delimiter ;
+
+call P_total();
+
+
+
+/* Q10: Find how much amount spent by each customer on artists? Write a query to return 
+ customer name, artist name and total spent */
 
 WITH best_selling_artist AS (
 	SELECT artist.artist_id AS artist_id, artist.name AS artist_name, SUM(invoice_line.unit_price*invoice_line.quantity) AS total_sales
