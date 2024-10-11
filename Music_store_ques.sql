@@ -1,11 +1,14 @@
 /* ======================================Questions============================================  */
-                     
+        
+        
 /* Q1: Who is the senior most employee based on job title? */                
 
 select Title,employee_id,first_name,last_name,levels
 from Employee
 order by levels desc
 limit 1;
+
+
 
 /* Q2: Which countries have the most Invoices? */
 
@@ -14,7 +17,19 @@ from invoice
 group by billing_country
 limit 1 ;
 
-/* Q3: What are top 3 values of total invoice? */
+
+
+/*Q3. write a query that returns the top 5 countries with the highest sales amount. */
+
+select inv.billing_country, sum(invl.unit_price * invl.quantity)
+from invoice inv
+join invoice_line invl
+on inv.invoice_id = invl.invoice_id
+group by 1
+order by 2 desc;
+
+
+/* Q4: What are top 3 values of total invoice? */
 
 select invoice_id,sum(total) as total
 from invoice
@@ -22,7 +37,8 @@ group by invoice_id
 order by sum(total) desc
 limit 3;
 
-/* Q4: Which city has the best customers? We would like to throw a promotional Music Festival in the city we made the most money. 
+
+/* Q5: Which city has the best customers? We would like to throw a promotional Music Festival in the city we made the most money. 
 Write a query that returns one city that has the highest sum of invoice totals. 
 Return both the city name & sum of all invoice totals */
 
@@ -32,7 +48,9 @@ group by billing_city
 order by sum(total) desc
 limit 1;
 
-/* Q5: Who is the best customer? The customer who has spent the most money will be declared the best customer. 
+
+
+/* Q6: Who is the best customer? The customer who has spent the most money will be declared the best customer. 
 Write a query that returns the person who has spent the most money. */
 
 select cus.customer_id,cus.first_name,sum(inv.total) as spending
@@ -45,7 +63,8 @@ order by spending desc
 limit 1;
 
 
-/* Q6: Write query to return the email, first name, last name, & Genre of all Rock Music listeners. 
+
+/* Q7: Write query to return the email, first name, last name, & Genre of all Rock Music listeners. 
 Return your list ordered alphabetically by email starting with A. */
 
 select distinct cus.email,cus.first_name,cus.last_name,ge.name
@@ -61,7 +80,9 @@ on ge.genre_id = tr.genre_id
 where ge.name like 'Rock' 
 order by cus.email;
 
-/* Q7: Let's invite the artists who have written the most rock music in our dataset. 
+
+
+/* Q8: Let's invite the artists who have written the most rock music in our dataset. 
 Write a query that returns the Artist name and total track count of the top 10 rock bands. */
 
 
@@ -75,7 +96,9 @@ group by ge.name,ar.name
 order by count(track_id) desc
 limit 10;
 
-/* Q8: Return all the track names that have a song length longer than the average song length. 
+
+
+/* Q9: Return all the track names that have a song length longer than the average song length. 
 Return the Name and Milliseconds for each track. Order by the song length with the 
 longest songs listed first */
 
@@ -86,7 +109,9 @@ from track)
 order by milliseconds desc;
 
 
-/* Q9: Make a stored procedure to display artist name and total amount of their album sales */  
+
+
+/* Q10: Make a stored procedure to display artist name and total amount of their album sales */  
 
 delimiter $$
 create procedure P_total()
@@ -111,7 +136,7 @@ call P_total();
 
 
 
-/* Q10: Find how much amount spent by each customer on artists? Write a query to return 
+/* Q11: Find how much amount spent by each customer on artists? Write a query to return 
  customer name, artist name and total spent */
 
 WITH best_selling_artist AS (
