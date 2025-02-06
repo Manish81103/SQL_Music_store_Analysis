@@ -21,12 +21,13 @@ limit 1 ;
 
 /*Q3. write a query that returns the top 5 countries with the highest sales amount. */
 
-select inv.billing_country, sum(invl.unit_price * invl.quantity)
+select inv.billing_country, round(sum(invl.unit_price * invl.quantity),2) as sales
 from invoice inv
 join invoice_line invl
 on inv.invoice_id = invl.invoice_id
 group by 1
-order by 2 desc;
+order by 2 desc
+limit 5;
 
 
 /* Q4: What are top 3 values of total invoice? */
@@ -135,8 +136,18 @@ delimiter ;
 call P_total();
 
 
+/* Q11.Write a query to give ranks to customers by their total invoice amount */
 
-/* Q11: Find how much amount spent by each customer on artists? Write a query to return 
+select t.customer_id, total,
+dense_rank() over(order by total desc)as rank_ from
+(select cus.customer_id,round(sum(inv.total),2) as total
+from customer cus
+join invoice inv on cus.customer_id = inv.customer_id
+group by 1) t;
+
+
+
+/* Q12: Find how much amount spent by each customer on artists? Write a query to return 
  customer name, artist name and total spent */
 
 WITH best_selling_artist AS (
@@ -158,3 +169,4 @@ JOIN album alb ON alb.album_id = t.album_id
 JOIN best_selling_artist bsa ON bsa.artist_id = alb.artist_id
 GROUP BY 1,2,3,4
 ORDER BY 5 DESC;
+
